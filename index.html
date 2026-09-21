@@ -172,7 +172,7 @@
       <h2>🚀 Trilha de estudo (siga a ordem!)</h2>
       <p class="tinta" style="margin-bottom:6px;">📖 Leitura → 🎯 Quiz → 🗺️ Resumo → 📝 Simulado. Estude aos poucos, no seu ritmo. 💪</p>
       <div class="trilha">
-        <div class="cartao c1" data-ir="leitura"><div class="passo">PASSO 1</div><div class="emoji">📖</div><h3>Leitura Guiada</h3><p>Viaje pelas 5 paradas e responda com suas palavras. Cada parada abre a próxima.</p></div>
+        <div class="cartao c1" data-ir="leitura"><div class="passo">PASSO 1</div><div class="emoji">📖</div><h3>Leitura Guiada</h3><p>Viaje pelas 5 paradas e clique na resposta certa de cada pergunta. Cada parada abre a próxima.</p></div>
         <div class="cartao c2" data-ir="quiz"><div class="passo">PASSO 2</div><div class="emoji">🎯</div><h3>Quiz</h3><p>12 perguntas rápidas para testar o que entendeu. Ganha um código MED.</p></div>
         <div class="cartao c3" data-ir="resumo"><div class="passo">PASSO 3</div><div class="emoji">🗺️</div><h3>Resumo</h3><p>Linha do tempo e o "resumão" da prova para fechar as lacunas.</p></div>
         <div class="cartao c4" data-ir="simulado"><div class="passo">PASSO 4</div><div class="emoji">📝</div><h3>Simulado</h3><p>25 questões valendo, com gabarito comentado. Ganha um código SIM.</p></div>
@@ -181,7 +181,7 @@
     <div class="secao">
       <h2>📝 Como usar esta máquina do tempo</h2>
       <ol class="comousar">
-        <li>Faça a <b>Leitura Guiada</b> e responda com <b>suas próprias palavras</b> (sem copiar do texto).</li>
+        <li>Faça a <b>Leitura Guiada</b>: leia cada parada e <b>clique na resposta certa</b> de cada pergunta.</li>
         <li>Teste-se no <b>Quiz</b> enquanto o assunto está fresco.</li>
         <li>Use o <b>Resumo</b> para reforçar o que o Quiz mostrou que faltou.</li>
         <li>Enfrente o <b>Simulado</b> e confira o gabarito comentado.</li>
@@ -194,7 +194,7 @@
   <div class="pagina" id="pg-leitura">
     <div class="secao">
       <h2>📖 Leitura Guiada — 5 paradas no tempo</h2>
-      <p class="tinta">Leia cada parada, depois responda as 3 perguntas <b>com suas palavras</b>. Clique em <b>Conferir parada</b> para liberar a próxima. Se a resposta ficar igual ao texto, a máquina vai pedir para você reescrever do seu jeito. 🚀</p>
+      <p class="tinta">Leia cada parada, depois responda as 3 perguntas <b>clicando</b> na resposta certa. Clique em <b>Conferir parada</b> para ver se acertou e liberar a próxima. 🚀</p>
     </div>
     <div id="blocosLeitura"></div>
     <div class="secao">
@@ -342,36 +342,6 @@ if(!STATE.simulado) STATE.simulado={sel:{},feito:false};
 if(!STATE.codigos) STATE.codigos={};
 
 /* ---------- utilidades ---------- */
-function normalizar(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();}
-function palavras(s){var n=normalizar(s);return n?n.split(' '):[];}
-
-/* deteccao de copia: 2 degraus segundo a regra */
-function ehTranscricao(resposta, fonte, pergunta){
-  var aw=palavras(resposta);
-  if(aw.length<4) return false;
-  var qs=' '+palavras(pergunta).join(' ')+' ';
-  var marcado=new Array(aw.length).fill(false);
-  for(var i=0;i<aw.length;i++){
-    var run=[], j=i;
-    while(j<aw.length){ run.push(aw[j]); if(qs.indexOf(' '+run.join(' ')+' ')>=0){ j++; } else { run.pop(); break; } }
-    if(run.length>=4){ for(var k=i;k<i+run.length;k++) marcado[k]=true; }
-  }
-  var eff=aw.filter(function(w,idx){return !marcado[idx];});
-  if(eff.length===0) return false;
-  var src=' '+palavras(fonte).join(' ')+' ';
-  var maxRun=0, cobertas=0, p=0;
-  while(p<eff.length){
-    var run2=[], q=p;
-    while(q<eff.length){ run2.push(eff[q]); if(src.indexOf(' '+run2.join(' ')+' ')>=0){ q++; } else { run2.pop(); break; } }
-    if(run2.length>maxRun) maxRun=run2.length;
-    if(run2.length>=5){ cobertas+=run2.length; p+=run2.length; } else { p++; }
-  }
-  if(maxRun>=8) return true;
-  if(cobertas/eff.length>0.6) return true;
-  return false;
-}
-
-/* gerador seeded para embaralhar */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function embaralhar(arr,seed){var r=mulberry32(seed);var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
@@ -386,15 +356,24 @@ var LEITURA=[
   fonte:'No Egito Antigo as pessoas usavam um calendario solar de 365 dias criado para prever as cheias do rio Nilo e aproveitar a agua para deixar as terras ferteis. Como fazia muito calor o ano todo era dificil separar as quatro estacoes. Por isso os egipcios dividiram o ano em tres estacoes cada uma com quatro meses. Inundacao julho a outubro o rio Nilo enchia e a agua ficava avermelhada. Essa estacao comecava com o aparecimento da estrela Sirio que marcava o ano novo egipcio. Semeadura novembro a fevereiro a cheia terminava e as terras ficavam ferteis. Os egipcios plantavam papiro para papel linho para tecidos cevada para cerveja e trigo para paes. Colheita marco a junho recolhiam os produtos. Sabiam que a estacao chegou porque a agua do Nilo ficava esverdeada.',
   conceitos:['Calendário solar: baseado no Sol, com 365 dias.','As 3 estações egípcias: inundação, semeadura e colheita.','Rio Nilo e a estrela Sírio marcavam o tempo.'],
   perguntas:[
-    {q:'Imagine que você é um agricultor no Egito Antigo. Explique, com suas palavras, por que era tão importante saber quando o rio Nilo ia encher.',tipo:'apl',
-     modelo:'Porque a cheia do Nilo deixava a terra fértil (adubada) para plantar. Sabendo a época, o agricultor aproveitava a água nos diques e plantava na hora certa.',
-     chk:['Falei que a cheia deixava a terra boa para plantar?','Falei que ajudava a saber a hora certa de usar a água ou de plantar?']},
-    {q:'O ano no Egito tinha 3 estações, e não 4 como conhecemos hoje. Explique por que os egípcios dividiram assim.',tipo:'apl',
-     modelo:'Porque fazia muito calor o ano inteiro e era difícil diferenciar as 4 estações. Então eles dividiram o ano pelas mudanças do rio Nilo, em 3 estações: inundação, semeadura e colheita.',
-     chk:['Falei que fazia muito calor o ano todo?','Falei que dividiram pelas mudanças do rio Nilo, em 3 estações?']},
-    {q:'Escreva, com suas palavras, o que marcava cada estação egípcia: inundação, semeadura e colheita.',tipo:'con',
-     modelo:'Inundação: cheia do Nilo, água avermelhada e estrela Sírio (jul–out). Semeadura: terras férteis, plantio de papiro, linho, cevada e trigo (nov–fev). Colheita: recolher os produtos, água esverdeada (mar–jun).',
-     chk:['Descrevi a inundação (cheia / água avermelhada / Sírio)?','Descrevi a semeadura (terra fértil / plantio)?','Descrevi a colheita (recolher / água esverdeada)?']}
+    {q:'Por que era tão importante para os egípcios saber quando o rio Nilo ia encher?',o:[
+       {t:'Porque a cheia deixava a terra fértil, e assim eles plantavam na hora certa',c:true},
+       {t:'Porque a cheia trazia muitos peixes para pescar',c:false},
+       {t:'Porque o rio secava e eles precisavam mudar de cidade',c:false},
+       {t:'Porque a cheia marcava o início das festas romanas',c:false}],
+     e:'A cheia do Nilo deixava a terra fértil (adubada). Sabendo a época, o agricultor aproveitava a água e plantava na hora certa.'},
+    {q:'Por que o ano no Egito tinha 3 estações, e não 4 como conhecemos hoje?',o:[
+       {t:'Porque fazia muito calor o ano todo e era difícil separar as 4 estações',c:true},
+       {t:'Porque o ano deles tinha só 3 meses',c:false},
+       {t:'Porque copiaram o calendário dos romanos',c:false},
+       {t:'Porque não conheciam o Sol nem a Lua',c:false}],
+     e:'Como fazia calor o ano inteiro, era difícil diferenciar as 4 estações. Por isso dividiram o ano pelas mudanças do Nilo em 3 estações: inundação, semeadura e colheita.'},
+    {q:'Durante a estação da INUNDAÇÃO, a água do rio Nilo ficava de que cor?',o:[
+       {t:'Avermelhada',c:true},
+       {t:'Esverdeada',c:false},
+       {t:'Azul-clara',c:false},
+       {t:'Amarela',c:false}],
+     e:'Na inundação (jul–out) a água ficava avermelhada. Na colheita (mar–jun) ela ficava esverdeada — não troque as cores!'}
   ]},
 
  {id:'b2',cor:'#7c50d6',emoji:'📅',titulo:'Parada 2 — A Sala dos Calendários e as religiões',
@@ -406,15 +385,24 @@ var LEITURA=[
   fonte:'Existem tres tipos de calendario o solar baseado na Terra ao redor do Sol o lunar baseado na Lua o mais antigo e o lunissolar mistura os dois. O comeco da contagem do tempo o marco inicial mudou de povo para povo muitas vezes por causa da religiao. O calendario judaico e lunissolar e seu marco inicial e o exodo a saida dos judeus escravizados no Egito. O calendario gregoriano que usamos hoje teve origem em Roma. Comecou com o calendario romano criado por Romulo em 753 ac lunar 304 dias 10 meses. Depois Numa Pompilio acrescentou janeiro e fevereiro 12 meses. Em 46 ac Julio Cesar criou o calendario juliano 365 dias ano comecando em janeiro. Em 1582 o papa Gregorio XIII criou o gregoriano cujo marco inicial e o nascimento de Cristo ano 1. Os meses julho e agosto homenageiam Julio Cesar e Cesar Augusto. O calendario islamico e lunar e seu marco inicial e a Hegira a migracao do profeta Maome de Meca para Medina no ano 622.',
   conceitos:['3 tipos: solar (Sol), lunar (Lua, mais antigo), lunissolar (os dois).','Marco inicial: judaico = êxodo; gregoriano = nascimento de Cristo; islâmico = Hégira.','O gregoriano foi feito ao longo de séculos (romano → juliano → gregoriano).'],
   perguntas:[
-    {q:'Explique, com suas palavras, a diferença entre um calendário solar, um lunar e um lunissolar.',tipo:'con',
-     modelo:'O solar segue a Terra ao redor do Sol; o lunar segue as fases da Lua (é o mais antigo); o lunissolar mistura os dois (usa o Sol e a Lua).',
-     chk:['Expliquei o solar (Sol)?','Expliquei o lunar (Lua)?','Expliquei o lunissolar (os dois juntos)?']},
-    {q:'Cada calendário começa a contar o tempo a partir de um acontecimento importante (o "marco inicial"). Dê um exemplo do gregoriano e um do islâmico.',tipo:'apl',
-     modelo:'O gregoriano começa no nascimento de Cristo (ano 1). O islâmico começa na Hégira, que foi a fuga de Maomé de Meca para Medina, no ano 622.',
-     chk:['Falei que o gregoriano marca o nascimento de Cristo?','Falei que o islâmico marca a Hégira (Maomé de Meca para Medina)?']},
-    {q:'Um amigo disse que o calendário que usamos hoje surgiu de uma vez só. Usando o que você leu, explique por que isso está errado.',tipo:'apl',
-     modelo:'Ele foi feito ao longo de séculos: começou com o romano (de Rômulo), ganhou meses com Numa Pompílio, virou juliano com Júlio César e só em 1582 virou gregoriano com o papa Gregório XIII.',
-     chk:['Mostrei que passou por várias mudanças ao longo do tempo?','Citei pelo menos duas etapas (romano, juliano ou gregoriano)?']}
+    {q:'Qual é a diferença entre os calendários solar, lunar e lunissolar?',o:[
+       {t:'O solar segue o Sol, o lunar segue a Lua e o lunissolar mistura os dois',c:true},
+       {t:'O solar segue a Lua e o lunar segue o Sol',c:false},
+       {t:'Todos seguem apenas as estrelas',c:false},
+       {t:'Só muda o nome: os três funcionam do mesmo jeito',c:false}],
+     e:'Solar = baseado no Sol; lunar = baseado na Lua (o mais antigo); lunissolar = mistura os dois.'},
+    {q:'Qual é o marco inicial (o começo da contagem) do calendário gregoriano, que usamos hoje?',o:[
+       {t:'O nascimento de Cristo (ano 1)',c:true},
+       {t:'A Hégira, de Maomé',c:false},
+       {t:'O êxodo dos judeus',c:false},
+       {t:'A fundação de Roma',c:false}],
+     e:'O gregoriano conta a partir do nascimento de Cristo. O islâmico marca a Hégira e o judaico marca o êxodo — cuidado para não trocar.'},
+    {q:'Um amigo disse que o calendário que usamos hoje surgiu de uma vez só. Ele está...',o:[
+       {t:'Errado: o calendário foi mudando ao longo de séculos (romano → juliano → gregoriano)',c:true},
+       {t:'Certo: o papa Gregório XIII criou tudo sozinho em 1582',c:false},
+       {t:'Certo: Júlio César fez o calendário inteiro de uma vez',c:false},
+       {t:'Errado: ele nunca mudou desde Rômulo',c:false}],
+     e:'Ele passou por várias etapas: começou com o romano (Rômulo), virou juliano (Júlio César) e só em 1582 virou gregoriano (papa Gregório XIII).'}
   ]},
 
  {id:'b3',cor:'#2ba36b',emoji:'✨',titulo:'Parada 3 — O céu do Brasil: povos indígenas e maias',
@@ -428,15 +416,24 @@ var LEITURA=[
   fonte:'Os maias na America tinham o calendario Haab que era solar 18 meses de 20 dias 360 dias mais 5 dias no fim o periodo Wayeb completando 365 dias. No Brasil os povos indigenas criaram a astronomia indigena observavam o Sol a Lua e as constelacoes conjuntos de estrelas que formam figuras e ligavam isso aos fenomenos da natureza como os periodos de chuva seca calor e frio. Os povos Tupi Guarani usavam quatro constelacoes como marco das quatro estacoes. Anta do Norte primavera aparece na segunda quinzena de setembro. Homem Velho verao segunda quinzena de dezembro. Cervo ou Veado outono segunda quinzena de marco. Ema inverno segunda quinzena de junho.',
   conceitos:['Calendário maia Haab: 18 meses de 20 dias + 5 dias (Wayeb) = 365.','Astronomia indígena: observar o céu para conhecer as estações.','Tupi-Guarani: Anta do Norte (primavera), Homem Velho (verão), Cervo (outono), Ema (inverno).'],
   perguntas:[
-    {q:'Os povos indígenas usavam as constelações como um "calendário no céu". Explique como uma constelação ajudava a saber a estação do ano, dando um exemplo.',tipo:'apl',
-     modelo:'Quando uma certa constelação aparecia no céu, indicava a chegada de uma estação. Por exemplo, a Ema aparece na segunda quinzena de junho e marca o inverno.',
-     chk:['Expliquei que a constelação aparecer no céu marcava a estação?','Dei um exemplo de constelação e sua estação?']},
-    {q:'Relacione cada constelação Tupi-Guarani à sua estação: Anta do Norte, Homem Velho, Cervo/Veado e Ema.',tipo:'apl',
-     modelo:'Anta do Norte = primavera; Homem Velho = verão; Cervo/Veado = outono; Ema = inverno.',
-     chk:['Acertei a Anta do Norte (primavera) e o Homem Velho (verão)?','Acertei o Cervo/Veado (outono) e a Ema (inverno)?']},
-    {q:'Explique, com suas palavras, como funcionava o calendário maia Haab.',tipo:'con',
-     modelo:'Era solar, com 18 meses de 20 dias (360 dias). No fim, juntavam 5 dias (o período Wayeb), completando 365 dias.',
-     chk:['Falei que tinha 18 meses de 20 dias?','Falei dos 5 dias finais (Wayeb), completando 365?']}
+    {q:'Como uma constelação ajudava os povos indígenas a saber a estação do ano?',o:[
+       {t:'Quando a constelação aparecia no céu, indicava a chegada de uma estação',c:true},
+       {t:'As constelações mostravam a hora do dia',c:false},
+       {t:'As constelações indicavam onde havia ouro',c:false},
+       {t:'As constelações serviam para contar dinheiro',c:false}],
+     e:'A astronomia indígena observava o céu: quando certa constelação aparecia, marcava uma estação. Ex.: a Ema aparece em junho e marca o inverno.'},
+    {q:'Para os povos Tupi-Guarani, qual constelação marca o INVERNO?',o:[
+       {t:'Ema',c:true},
+       {t:'Anta do Norte',c:false},
+       {t:'Homem Velho',c:false},
+       {t:'Cervo (ou Veado)',c:false}],
+     e:'Ema = inverno; Anta do Norte = primavera; Homem Velho = verão; Cervo/Veado = outono.'},
+    {q:'Como funcionava o calendário maia Haab?',o:[
+       {t:'18 meses de 20 dias (360) mais 5 dias no fim (Wayeb), completando 365',c:true},
+       {t:'12 meses de 30 dias',c:false},
+       {t:'13 meses de 28 dias',c:false},
+       {t:'10 meses de 36 dias',c:false}],
+     e:'O Haab era solar: 18 meses de 20 dias = 360, mais os 5 dias do Wayeb = 365 dias.'}
   ]},
 
  {id:'b4',cor:'#1f7ae0',emoji:'🏛️',titulo:'Parada 4 — A Ágora de Atenas: o que é cidadania',
@@ -446,15 +443,24 @@ var LEITURA=[
   fonte:'Cidadania e o conjunto de direitos e deveres de uma pessoa em relacao ao Estado onde ela vive. Existem direitos civis ir e vir liberdade de expressao de pensamento e de religiao direito a justica e a propriedade direitos politicos votar eleger se participar de partidos propor leis e direitos sociais educacao saude moradia trabalho lazer. No Brasil esses direitos estao garantidos pela Constituicao de 1988 e por estatutos como o ECA e o Estatuto da Igualdade Racial. As primeiras ideias de cidadania surgiram ha mais de 2500 anos na Grecia Antiga na cidade de Atenas onde nasceu a democracia. Mas a cidadania nao era para todos so eram cidadaos os homens livres nascidos em Atenas. Ficavam de fora as mulheres os estrangeiros metecos e os escravizados. Atenas tinha democracia direta os proprios cidadaos votavam e decidiam tudo na Assembleia. O Brasil tem democracia representativa o povo elege representantes que decidem por ele. Para ser cidadao os gregos tambem valorizavam a educacao chamada Paideia ginastica musica leitura e escrita.',
   conceitos:['Cidadania = direitos e deveres em relação ao Estado.','Direitos civis, políticos e sociais.','Atenas: berço da democracia; só homens livres eram cidadãos.','Democracia direta (Atenas) x representativa (Brasil).'],
   perguntas:[
-    {q:'O que é cidadania? Explique com suas palavras.',tipo:'con',
-     modelo:'É o conjunto de direitos e deveres de uma pessoa em relação ao Estado (ao país) onde ela vive. Ser cidadão é ter direitos garantidos e também ter deveres.',
-     chk:['Falei em direitos E deveres?','Liguei à relação com o Estado ou o país?']},
-    {q:'Na Atenas antiga, a cidadania NÃO era para todos. Explique quem podia ser cidadão e cite dois grupos que ficavam de fora.',tipo:'apl',
-     modelo:'Só eram cidadãos os homens livres nascidos em Atenas. Ficavam de fora as mulheres, os estrangeiros (metecos) e os escravizados.',
-     chk:['Falei que só homens livres nascidos em Atenas eram cidadãos?','Citei dois grupos de fora (mulheres, metecos ou escravizados)?']},
-    {q:'Atenas tinha democracia direta e o Brasil tem democracia representativa. Explique a diferença com suas palavras.',tipo:'apl',
-     modelo:'Na democracia direta os próprios cidadãos votavam e decidiam tudo (na Assembleia). Na representativa, como no Brasil, o povo elege representantes que decidem por ele.',
-     chk:['Expliquei a direta (os cidadãos decidem eles mesmos)?','Expliquei a representativa (elegemos representantes)?']}
+    {q:'O que é cidadania?',o:[
+       {t:'O conjunto de direitos e deveres de uma pessoa em relação ao Estado onde vive',c:true},
+       {t:'Apenas o direito de votar',c:false},
+       {t:'Somente pagar impostos',c:false},
+       {t:'Morar numa cidade grande',c:false}],
+     e:'Cidadania reúne direitos (civis, políticos e sociais) E deveres em relação ao Estado (ao país).'},
+    {q:'Na Atenas antiga, quem podia ser cidadão?',o:[
+       {t:'Só os homens livres nascidos em Atenas',c:true},
+       {t:'Todas as pessoas',c:false},
+       {t:'As mulheres e os estrangeiros',c:false},
+       {t:'Os escravizados',c:false}],
+     e:'A cidadania não era para todos: ficavam de fora as mulheres, os estrangeiros (metecos) e os escravizados.'},
+    {q:'Qual é a diferença entre a democracia direta (Atenas) e a representativa (Brasil)?',o:[
+       {t:'Na direta os próprios cidadãos decidem; na representativa elegemos representantes que decidem por nós',c:true},
+       {t:'Não existe diferença nenhuma',c:false},
+       {t:'A democracia direta é a que usamos hoje no Brasil',c:false},
+       {t:'A representativa é mais antiga que a direta',c:false}],
+     e:'Em Atenas os cidadãos votavam e decidiam tudo na Assembleia (direta). No Brasil elegemos representantes (representativa).'}
   ]},
 
  {id:'b5',cor:'#ef5b5b',emoji:'🏟️',titulo:'Parada 5 — O Fórum de Roma: a cidadania romana',
@@ -464,15 +470,24 @@ var LEITURA=[
   fonte:'Roma foi fundada em 753 ac e era formada por varios povos como os latinos e os etruscos. A sociedade romana tinha dois grupos principais os patricios as familias nobres donas das maiores terras e os plebeus o restante da populacao tambem chamados de populus o povo camponeses artesaos e comerciantes. So os patricios eram considerados cidadaos e podiam ocupar cargos publicos como o Senado. Havia ainda outros dois grupos os clientes que prestavam servicos aos patricios em troca de protecao e os escravizados. Em 509 ac Roma se tornou uma republica palavra que significa coisa publica um governo com regras e uniao entre os cidadaos. Quando Roma entrou em muitas guerras os plebeus tiveram que servir no exercito a legiao como legionarios e em troca passaram a exigir dos patricios mais participacao politica.',
   conceitos:['Roma fundada em 753 a.C. (latinos e etruscos).','Patrícios (nobres, únicos cidadãos) e plebeus (o povo). Também clientes e escravizados.','509 a.C.: Roma vira república ("coisa pública").','Plebeus foram à guerra (legião) e exigiram direitos.'],
   perguntas:[
-    {q:'Quais eram os dois grupos principais da sociedade romana e qual deles era considerado cidadão?',tipo:'con',
-     modelo:'Eram os patrícios (as famílias nobres) e os plebeus (o povo). Só os patrícios eram considerados cidadãos e podiam ocupar cargos como o Senado.',
-     chk:['Citei patrícios e plebeus?','Falei que só os patrícios eram cidadãos?']},
-    {q:'Explique, com suas palavras, como os plebeus começaram a conquistar direitos em Roma.',tipo:'apl',
-     modelo:'Quando Roma entrou em muitas guerras, os plebeus tiveram que servir no exército (a legião) como legionários. Em troca, passaram a exigir dos patrícios mais participação política.',
-     chk:['Falei que os plebeus foram para o exército / as guerras?','Falei que, em troca, exigiram participação política ou direitos?']},
-    {q:'A palavra "república" significa "coisa pública". Escreva uma frase sua explicando o que isso quer dizer sobre governar.',tipo:'apl',
-     modelo:'Quer dizer que o governo é assunto de todos (do povo), com regras e união entre os cidadãos, e não uma propriedade de uma pessoa só.',
-     chk:['Liguei república a algo "de todos" / do povo / público?','Falei em regras ou em todos participarem?']}
+    {q:'Quais eram os dois grupos principais da sociedade romana, e qual deles era cidadão?',o:[
+       {t:'Patrícios (as famílias nobres, os únicos cidadãos) e plebeus (o povo)',c:true},
+       {t:'Plebeus (os cidadãos) e patrícios (o povo)',c:false},
+       {t:'Clientes e escravizados',c:false},
+       {t:'Latinos e etruscos, os dois eram cidadãos',c:false}],
+     e:'Só os patrícios eram considerados cidadãos e podiam ocupar cargos como o Senado. Os plebeus eram o povo (populus).'},
+    {q:'Como os plebeus começaram a conquistar direitos em Roma?',o:[
+       {t:'Servindo no exército (a legião) nas guerras e, em troca, exigindo mais participação política',c:true},
+       {t:'Comprando o título de patrício',c:false},
+       {t:'Saindo de Roma para sempre',c:false},
+       {t:'Virando escravizados',c:false}],
+     e:'Quando Roma entrou em muitas guerras, os plebeus foram para a legião como legionários e passaram a exigir dos patrícios mais participação política.'},
+    {q:'A palavra "república" significa "coisa pública". O que isso quer dizer sobre governar?',o:[
+       {t:'Que o governo é assunto de todos (do povo), com regras, e não propriedade de uma pessoa só',c:true},
+       {t:'Que só o rei pode governar',c:false},
+       {t:'Que não existem regras no governo',c:false},
+       {t:'Que só os patrícios podiam morar em Roma',c:false}],
+     e:'República = coisa pública: um governo com regras e união entre os cidadãos, e não pertencente a uma só pessoa.'}
   ]}
 ];
 
@@ -565,13 +580,14 @@ document.querySelectorAll('[data-ir]').forEach(function(c){
   c.addEventListener('click',function(){irPara(c.getAttribute('data-ir'));});
 });
 
-/* ================= RENDER LEITURA ================= */
+/* ================= RENDER LEITURA (MÚLTIPLA ESCOLHA) ================= */
 function renderLeitura(){
   var cont=document.getElementById('blocosLeitura');
   cont.innerHTML='';
   LEITURA.forEach(function(bl,bi){
-    if(!STATE.leitura[bl.id]) STATE.leitura[bl.id]={feito:false,resp:{}};
+    if(!STATE.leitura[bl.id]) STATE.leitura[bl.id]={feito:false,sel:{}};
     var salvo=STATE.leitura[bl.id];
+    if(!salvo.sel) salvo.sel={};
     var div=document.createElement('div');
     div.className='bloco';
     div.id='bloco-'+bl.id;
@@ -582,133 +598,85 @@ function renderLeitura(){
       '<div class="leituraTexto">'+bl.html+'</div>'+
       '<div class="conceitos"><b>🔑 Conceitos e palavras importantes:</b><ul>'+conceitosLi+'</ul></div>';
     bl.perguntas.forEach(function(pg,pi){
-      var r = (salvo.resp&&salvo.resp['q'+pi])||{};
-      var tagCls = pg.tipo==='apl'?'apl':'con';
-      var tagTxt = pg.tipo==='apl'?'aplicação':'conceito';
       html+='<div class="pergunta" id="p-'+bl.id+'-'+pi+'">'+
-        '<div class="enun">'+(pi+1)+') '+pg.q+'<span class="tag '+tagCls+'">'+tagTxt+'</span></div>'+
-        '<textarea id="t-'+bl.id+'-'+pi+'" placeholder="Escreva a sua resposta aqui...">'+(r.resp?r.resp.replace(/</g,'&lt;'):'')+'</textarea>'+
-        '<div class="aviso" id="av-'+bl.id+'-'+pi+'"></div>'+
-        '<div class="modelo" id="m-'+bl.id+'-'+pi+'">'+
-          '<div class="lab">💡 Resposta modelo:</div><div>'+pg.modelo+'</div>'+
-          '<div class="chk" id="chk-'+bl.id+'-'+pi+'"></div>'+
-        '</div>'+
-      '</div>';
+        '<div class="enun">'+(pi+1)+') '+pg.q+'</div>';
+      pg.o.forEach(function(al,ai){
+        html+='<label class="alt" data-b="'+bl.id+'" data-p="'+pi+'" data-a="'+ai+'">'+String.fromCharCode(97+ai)+') '+al.t+'</label>';
+      });
+      html+='<div class="coment" id="cl-'+bl.id+'-'+pi+'"></div></div>';
     });
     html+='<button class="btn principal" id="conf-'+bl.id+'">✅ Conferir parada</button>'+
       '<div class="statusBloco" id="st-'+bl.id+'"></div>';
     div.innerHTML=html;
     cont.appendChild(div);
-
-    // restaurar estado conferido
-    if(salvo.feito){
-      bl.perguntas.forEach(function(pg,pi){ mostrarModelo(bl,bi,pi); });
-      document.getElementById('st-'+bl.id).innerHTML=statusTexto(bl);
-    }
+    // restaurar seleções salvas
+    bl.perguntas.forEach(function(pg,pi){
+      var sel=salvo.sel['q'+pi];
+      if(typeof sel==='number'){
+        var lb=div.querySelector('.alt[data-p="'+pi+'"][data-a="'+sel+'"]');
+        if(lb) lb.classList.add('sel');
+      }
+    });
+    // clique nas alternativas (só antes de conferir)
+    div.querySelectorAll('.alt').forEach(function(el){
+      el.addEventListener('click',function(){
+        if(salvo.feito) return;
+        var pi=parseInt(el.getAttribute('data-p'),10), ai=parseInt(el.getAttribute('data-a'),10);
+        salvo.sel['q'+pi]=ai;
+        div.querySelectorAll('.alt[data-p="'+pi+'"]').forEach(function(x){x.classList.remove('sel');});
+        el.classList.add('sel');
+        salvarTudo();
+      });
+    });
+    if(salvo.feito) mostrarCorrecaoLeitura(bl,bi);
     document.getElementById('conf-'+bl.id).addEventListener('click',function(){conferirBloco(bl,bi);});
   });
   atualizarRevisar();
 }
 
-function statusTexto(bl){
-  var salvo=STATE.leitura[bl.id]; var revisar=0;
+function mostrarCorrecaoLeitura(bl,bi){
+  var salvo=STATE.leitura[bl.id];
   bl.perguntas.forEach(function(pg,pi){
-    var r=(salvo.resp&&salvo.resp['q'+pi])||{};
-    var temNao=false;
-    if(r.chk){ for(var k in r.chk){ if(r.chk[k]==='nao') temNao=true; } }
-    if(r.trans||temNao) revisar++;
+    var sel=salvo.sel['q'+pi];
+    var labels=document.querySelectorAll('#p-'+bl.id+'-'+pi+' .alt');
+    labels.forEach(function(lb){
+      var ai=parseInt(lb.getAttribute('data-a'),10);
+      lb.classList.remove('sel');
+      if(pg.o[ai] && pg.o[ai].c) lb.classList.add('certa');
+      else if(sel===ai) lb.classList.add('errada');
+    });
+    var c=document.getElementById('cl-'+bl.id+'-'+pi);
+    var acertou = typeof sel==='number' && pg.o[sel] && pg.o[sel].c;
+    c.className='coment mostra '+(acertou?'ok':'no');
+    var corretaTxt='';
+    pg.o.forEach(function(al,ai){ if(al.c) corretaTxt=String.fromCharCode(97+ai)+') '+al.t; });
+    c.innerHTML=(acertou?'✅ Você acertou! ':'❌ A resposta certa é <b>'+corretaTxt+'</b>. ')+pg.e;
   });
-  if(revisar===0) return '<span style="color:var(--verde-ok)">✅ Parada concluída! Mandou bem!</span>';
-  return '<span style="color:var(--coral)">🔁 Parada concluída. '+revisar+' resposta(s) para revisar (veja a lista no fim).</span>';
+  document.getElementById('st-'+bl.id).innerHTML=statusTexto(bl);
 }
 
-function mostrarModelo(bl,bi,pi){
-  var pg=bl.perguntas[pi];
-  var m=document.getElementById('m-'+bl.id+'-'+pi);
-  m.classList.add('mostra');
-  var salvo=STATE.leitura[bl.id];
-  var r=(salvo.resp&&salvo.resp['q'+pi])||{};
-  if(!r.chk) r.chk={};
-  var chkDiv=document.getElementById('chk-'+bl.id+'-'+pi);
-  var h='<div style="font-weight:bold;color:var(--nilo);margin-bottom:4px;">Confira você mesmo:</div>';
-  pg.chk.forEach(function(item,ci){
-    var val=r.chk['c'+ci]||'';
-    h+='<div class="item"><span>'+item+'</span><span class="btns">'+
-      '<button class="sim'+(val==='sim'?' on':'')+'" data-b="'+bl.id+'" data-p="'+pi+'" data-c="'+ci+'" data-v="sim">Sim</button>'+
-      '<button class="nao'+(val==='nao'?' on':'')+'" data-b="'+bl.id+'" data-p="'+pi+'" data-c="'+ci+'" data-v="nao">Não</button>'+
-      '</span></div>';
+function statusTexto(bl){
+  var salvo=STATE.leitura[bl.id]; var acertos=0;
+  bl.perguntas.forEach(function(pg,pi){
+    var sel=salvo.sel['q'+pi];
+    if(typeof sel==='number' && pg.o[sel] && pg.o[sel].c) acertos++;
   });
-  chkDiv.innerHTML=h;
-  chkDiv.querySelectorAll('button').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var bid=btn.getAttribute('data-b'),ppi=btn.getAttribute('data-p'),cci=btn.getAttribute('data-c'),vv=btn.getAttribute('data-v');
-      var rr=STATE.leitura[bid].resp['q'+ppi]; if(!rr.chk) rr.chk={};
-      rr.chk['c'+cci]=vv;
-      salvarTudo();
-      mostrarModelo(bl,bi,parseInt(ppi,10));
-      document.getElementById('st-'+bid).innerHTML=statusTexto(bl);
-      atualizarRevisar();
-    });
-  });
-  // marca vermelha se transcrita
-  var perg=document.getElementById('p-'+bl.id+'-'+pi);
-  if(r.trans){ perg.classList.add('vermelha');
-    var av=document.getElementById('av-'+bl.id+'-'+pi);
-    av.className='aviso verm';
-    av.innerHTML='🔁 Esta resposta ficou muito parecida com o texto. Tente reescrever com as suas palavras — quando fizer isso, a marca some sozinha.';
-  } else {
-    perg.classList.remove('vermelha');
-    var av2=document.getElementById('av-'+bl.id+'-'+pi); av2.className='aviso'; av2.innerHTML='';
-  }
+  if(acertos===bl.perguntas.length) return '<span style="color:var(--verde-ok)">✅ Parada concluída! Você acertou as '+acertos+'! Mandou bem! 🌟</span>';
+  return '<span style="color:var(--coral)">✅ Parada concluída. Você acertou '+acertos+' de '+bl.perguntas.length+'. Leia as explicações e a lista do fim. 🔁</span>';
 }
 
 function conferirBloco(bl,bi){
-  // 1) todas preenchidas (min 3 caracteres)
+  var salvo=STATE.leitura[bl.id]; if(!salvo.sel) salvo.sel={};
   var faltou=false;
-  bl.perguntas.forEach(function(pg,pi){
-    var t=document.getElementById('t-'+bl.id+'-'+pi).value.trim();
-    if(t.length<3) faltou=true;
-  });
+  bl.perguntas.forEach(function(pg,pi){ if(typeof salvo.sel['q'+pi]!=='number') faltou=true; });
   if(faltou){
-    document.getElementById('st-'+bl.id).innerHTML='<span style="color:var(--coral)">✋ Responda as 3 perguntas (com pelo menos algumas palavras) antes de conferir.</span>';
+    document.getElementById('st-'+bl.id).innerHTML='<span style="color:var(--coral)">✋ Escolha uma resposta nas 3 perguntas antes de conferir.</span>';
     return;
   }
-  var salvo=STATE.leitura[bl.id]; if(!salvo.resp) salvo.resp={};
-  var travou=false;
-  bl.perguntas.forEach(function(pg,pi){
-    var t=document.getElementById('t-'+bl.id+'-'+pi).value.trim();
-    var r=salvo.resp['q'+pi]||{}; r.resp=t;
-    var copia=ehTranscricao(t,bl.fonte,pg.q);
-    if(copia){
-      if(!r.tentou){
-        // 1a deteccao: nao aceita ainda
-        r.tentou=t;
-        salvo.resp['q'+pi]=r;
-        var av=document.getElementById('av-'+bl.id+'-'+pi);
-        av.className='aviso amarelo';
-        av.innerHTML='✏️ Boa parte da sua resposta está igual ao texto. Tente reescrever com as suas palavras — explique como se fosse para um amigo, sem olhar o texto. Pode ficar mais curto e simples, o que vale é ser SEU.';
-        travou=true;
-      } else {
-        // 2a tentativa: aceita mas marca vermelha
-        r.trans=true;
-        salvo.resp['q'+pi]=r;
-      }
-    } else {
-      r.trans=false;
-      salvo.resp['q'+pi]=r;
-    }
-  });
-  salvarTudo();
-  if(travou){
-    document.getElementById('st-'+bl.id).innerHTML='<span style="color:#a06b00">✏️ Reescreva as respostas marcadas em amarelo e clique em Conferir de novo.</span>';
-    return;
-  }
-  // conferido
   salvo.feito=true;
   salvarTudo();
-  bl.perguntas.forEach(function(pg,pi){ mostrarModelo(bl,bi,pi); });
-  document.getElementById('st-'+bl.id).innerHTML=statusTexto(bl);
-  // libera proximo
+  mostrarCorrecaoLeitura(bl,bi);
+  // libera a próxima parada
   if(bi+1<LEITURA.length){
     var prox=document.getElementById('bloco-'+LEITURA[bi+1].id);
     if(prox) prox.classList.remove('travado');
@@ -716,43 +684,16 @@ function conferirBloco(bl,bi){
   atualizarRevisar();
 }
 
-/* atualiza respostas para revisar; tambem apaga marca se reescreveu */
-document.addEventListener('input',function(ev){
-  if(ev.target && ev.target.tagName==='TEXTAREA' && ev.target.id.indexOf('t-')===0){
-    var partes=ev.target.id.split('-'); // t, blId, pi
-    var blId=partes[1], pi=partes[2];
-    var bl=LEITURA.filter(function(x){return x.id===blId;})[0];
-    if(!bl) return;
-    var salvo=STATE.leitura[blId];
-    if(salvo&&salvo.resp&&salvo.resp['q'+pi]){
-      var r=salvo.resp['q'+pi];
-      r.resp=ev.target.value;
-      if(r.trans){
-        var pg=bl.perguntas[pi];
-        if(!ehTranscricao(ev.target.value,bl.fonte,pg.q)){
-          r.trans=false; r.tentou=null;
-          var perg=document.getElementById('p-'+blId+'-'+pi);
-          if(perg) perg.classList.remove('vermelha');
-          var av=document.getElementById('av-'+blId+'-'+pi); if(av){av.className='aviso';av.innerHTML='';}
-          var st=document.getElementById('st-'+blId); if(st&&salvo.feito) st.innerHTML=statusTexto(bl);
-        }
-      }
-      salvarTudo();
-      atualizarRevisar();
-    }
-  }
-});
-
 function atualizarRevisar(){
   var lista=document.getElementById('listaRevisar');
   var itens=[];
   LEITURA.forEach(function(bl){
-    var salvo=STATE.leitura[bl.id]; if(!salvo||!salvo.resp) return;
+    var salvo=STATE.leitura[bl.id]; if(!salvo||!salvo.feito||!salvo.sel) return;
     bl.perguntas.forEach(function(pg,pi){
-      var r=salvo.resp['q'+pi]; if(!r) return;
-      var temNao=false; if(r.chk){for(var k in r.chk){if(r.chk[k]==='nao')temNao=true;}}
-      if(r.trans||temNao){
-        itens.push('<div class="cai"><b>'+bl.emoji+' '+bl.titulo.split('—')[0].trim()+'</b> — pergunta '+(pi+1)+(r.trans?' (ficou parecida com o texto)':'')+(temNao?' (você marcou "Não" na conferência)':'')+'</div>');
+      var sel=salvo.sel['q'+pi];
+      var acertou = typeof sel==='number' && pg.o[sel] && pg.o[sel].c;
+      if(!acertou){
+        itens.push('<div class="cai"><b>'+bl.emoji+' '+bl.titulo.split('—')[0].trim()+'</b> — pergunta '+(pi+1)+' (você errou; releia a explicação na parada)</div>');
       }
     });
   });
@@ -857,17 +798,23 @@ document.getElementById('btnAbrirRel').addEventListener('click',function(){
 });
 function montarRelatorio(){
   var painel=document.getElementById('painelRel'); painel.classList.add('mostra');
-  // leitura
-  var blocosFeitos=0, vermelhas=0, checkNao=0;
+  // leitura (múltipla escolha)
+  var blocosFeitos=0, acertosLeit=0, totalLeit=0, errosLeit=0;
   LEITURA.forEach(function(bl){
-    var s=STATE.leitura[bl.id]; if(!s) return;
-    if(s.feito) blocosFeitos++;
-    if(s.resp){ for(var k in s.resp){ var r=s.resp[k]; if(r.trans) vermelhas++; if(r.chk){for(var c in r.chk){if(r.chk[c]==='nao')checkNao++;}} } }
+    var s=STATE.leitura[bl.id];
+    bl.perguntas.forEach(function(pg,pi){
+      totalLeit++;
+      if(s && s.sel && typeof s.sel['q'+pi]==='number'){
+        if(pg.o[s.sel['q'+pi]] && pg.o[s.sel['q'+pi]].c) acertosLeit++;
+        else if(s.feito) errosLeit++;
+      }
+    });
+    if(s && s.feito) blocosFeitos++;
   });
   var h='<div class="cardRel"><h3>📖 Leitura Guiada</h3>'+
     '<div class="linhaRel"><span>Paradas concluídas</span><span>'+blocosFeitos+' de '+LEITURA.length+'</span></div>'+
-    '<div class="linhaRel"><span>Respostas para revisar (parecidas com o texto)</span><span>'+vermelhas+'</span></div>'+
-    '<div class="linhaRel"><span>Pontos marcados como "Não" na autoconferência</span><span>'+checkNao+'</span></div></div>';
+    '<div class="linhaRel"><span>Acertos nas perguntas</span><span>'+acertosLeit+' de '+totalLeit+'</span></div>'+
+    '<div class="linhaRel"><span>Perguntas para revisar (errou)</span><span>'+errosLeit+'</span></div></div>';
   var q=STATE.quiz;
   h+='<div class="cardRel"><h3>🎯 Quiz</h3>'+
     '<div class="linhaRel"><span>Situação</span><span>'+(q.feito?('acertou '+q.acertos+' de '+q.total):'ainda não finalizou')+'</span></div>'+
